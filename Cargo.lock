@@ -1742,7 +1742,7 @@ dependencies = [
 [[package]]
 name = "ml-feed-cache"
 version = "0.1.0"
-source = "git+https://github.com/yral-dapp/yral-common?rev=088a871f986236bab45ff89e68886f4c8d802449#088a871f986236bab45ff89e68886f4c8d802449"
+source = "git+https://github.com/yral-dapp/yral-common?rev=72f33d4ef193ca4572a296f4d5f9914becf92a59#72f33d4ef193ca4572a296f4d5f9914becf92a59"
 dependencies = [
  "anyhow",
  "bb8",
@@ -1751,7 +1751,6 @@ dependencies = [
  "redis-macros",
  "serde",
  "serde-redis",
- "serde_bytes",
  "serde_json",
  "utoipa",
 ]

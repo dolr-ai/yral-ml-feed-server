@@ -32,7 +32,7 @@ utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.1", features = ["axum"] }
 log = "0.4.21"
 env_logger = "0.11.3"
-yral-ml-feed-cache = { git = "https://github.com/yral-dapp/yral-common", rev = "088a871f986236bab45ff89e68886f4c8d802449", package = "ml-feed-cache" } # yral-ml-feed-cache = { path = "../yral-common/ml-feed-cache", package = "ml-feed-cache" }
+yral-ml-feed-cache = { git = "https://github.com/yral-dapp/yral-common", rev = "72f33d4ef193ca4572a296f4d5f9914becf92a59", package = "ml-feed-cache" } # yral-ml-feed-cache = { path = "../yral-common/ml-feed-cache", package = "ml-feed-cache" }
 rand = "0.9.0"
 sentry = { version = "0.37.0", default-features = false, features = [
     "rustls",
