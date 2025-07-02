@@ -22,11 +22,11 @@ pub struct RecommendationRequest {
 }
 
 // Re-export the mixed endpoint handler and its path macro
-pub use mixed::__path_get_feed_mixed_v2;
-pub use mixed::get_feed_mixed_v2;
+pub use mixed::__path_get_feed_mixed_v3;
+pub use mixed::get_feed_mixed_v3;
 
 pub fn feed_router_v2(state: Arc<AppState>) -> OpenApiRouter {
     OpenApiRouter::new()
-        .routes(routes!(get_feed_mixed_v2))
+        .routes(routes!(get_feed_mixed_v3))
         .with_state(state)
 }

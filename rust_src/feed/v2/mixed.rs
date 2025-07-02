@@ -26,7 +26,7 @@ const RECOMMENDATION_SERVICE_URL: &str =
     ),
     tag = "ML_FEED"
 )]
-pub async fn get_feed_mixed_v2(
+pub async fn get_feed_mixed_v3(
     State(state): State<Arc<AppState>>,
     Json(req): Json<FeedRequestV2>,
 ) -> Result<Json<FeedResponseV2>, StatusCode> {
