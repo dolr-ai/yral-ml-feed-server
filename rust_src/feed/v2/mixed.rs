@@ -8,7 +8,7 @@ use yral_ml_feed_cache::{
         MAX_WATCH_HISTORY_CACHE_LEN, USER_WATCH_HISTORY_CLEAN_SUFFIX,
         USER_WATCH_HISTORY_NSFW_SUFFIX,
     },
-    types::{FeedRequest, FeedResponse, FeedResponseV2, PostItem, PostItemV2},
+    types::{FeedRequest, FeedRequestV2, FeedResponse, FeedResponseV2, PostItem, PostItemV2},
 };
 
 const RECOMMENDATION_SERVICE_URL: &str =
@@ -17,7 +17,7 @@ const RECOMMENDATION_SERVICE_URL: &str =
 #[utoipa::path(
     post,
     path = "/mixed",
-    request_body = FeedRequest,
+    request_body = FeedRequestV2,
     responses(
         (status = 200, description = "Successfully retrieved mixed feed", body = FeedResponseV2),
         (status = 502, description = "Bad gateway - recommendation service error"),
@@ -27,22 +27,16 @@ const RECOMMENDATION_SERVICE_URL: &str =
 )]
 pub async fn get_feed_mixed_v2(
     State(state): State<Arc<AppState>>,
-    Json(req): Json<FeedRequest>,
+    Json(req): Json<FeedRequestV2>,
 ) -> Result<Json<FeedResponseV2>, StatusCode> {
     // Collect watch history from both clean and nsfw caches
     let watch_history = collect_watch_history(&state, &req.canister_id).await?;
 
-    let excluded_videos: Vec<String> = req
-        .filter_results
-        .iter()
-        .map(|post| post.video_id.clone())
-        .collect();
-
     // Transform to recommendation service format
     let recommendation_request = RecommendationRequest {
-        user_id: req.canister_id.clone(),
+        user_id: req.user_id.clone(),
         watch_history,
-        exclude_watched_items: excluded_videos,
+        exclude_watched_items: req.filter_results,
     };
 
     // Call recommendation service
