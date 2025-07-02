@@ -37,8 +37,13 @@ pub async fn get_feed_mixed_v3(
     let recommendation_request = RecommendationRequest {
         user_id: req.user_id.clone(),
         watch_history,
-        exclude_watched_items: req.filter_results,
+        exclude_watched_items: vec![], // req.filter_results,
     };
+
+    println!(
+        "Collecting watch history for user {:?} items",
+        recommendation_request
+    );
 
     // Call recommendation service
     let client = reqwest::Client::new();
