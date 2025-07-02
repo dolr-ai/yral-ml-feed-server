@@ -16,7 +16,7 @@ tower-http = { version = "0.6.2", default-features = false, features = [
 tower = { version = "0.5.1", features = ["full"] }
 candid = "0.10.6"
 serde_bytes = "0.11.14"
-ic-agent = "0.33.0"
+ic-agent = "0.38.1"
 serde = "1.0.197"
 serde_json = "1.0.114"
 chrono = "0.4.38"
@@ -32,7 +32,8 @@ utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.1", features = ["axum"] }
 log = "0.4.21"
 env_logger = "0.11.3"
-yral-ml-feed-cache = { git = "https://github.com/yral-dapp/yral-common", rev = "a4137e2353b77931d12d0bcd2dd9e777ab901f2d", package = "ml-feed-cache" } # yral-ml-feed-cache = { path = "../yral-common/ml-feed-cache", package = "ml-feed-cache" }
+yral-ml-feed-cache = { git = "https://github.com/dolr-ai/yral-common", rev = "543026f635ca75275b22f8acec045d7419431e23", package = "ml-feed-cache" } # yral-ml-feed-cache = { path = "../yral-common/ml-feed-cache", package = "ml-feed-cache" }
+yral-types = { git = "https://github.com/dolr-ai/yral-common.git", rev = "543026f635ca75275b22f8acec045d7419431e23" } # yral-types = { path = "../yral-common/yral-types", package = "yral-types" }
 rand = "0.9.0"
 sentry = { version = "0.37.0", default-features = false, features = [
     "rustls",

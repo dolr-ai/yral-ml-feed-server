@@ -8,8 +8,9 @@ use yral_ml_feed_cache::{
         MAX_WATCH_HISTORY_CACHE_LEN, USER_WATCH_HISTORY_CLEAN_SUFFIX,
         USER_WATCH_HISTORY_NSFW_SUFFIX,
     },
-    types::{FeedRequest, FeedRequestV2, FeedResponse, FeedResponseV2, PostItem, PostItemV2},
+    types::{FeedRequest, FeedResponse, PostItem},
 };
+use yral_types::post::{FeedRequestV2, FeedResponseV2};
 
 const RECOMMENDATION_SERVICE_URL: &str =
     "https://recommendation-service-749244211103.us-central1.run.app/recommendations";
