@@ -55,7 +55,7 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Set secret tokens
         run: |
-          APP_NAME="pr-${{github.event.number}}-yral-dapp-yral-ml-feed-server"
+          APP_NAME="pr-${{github.event.number}}-dolr-ai-yral-ml-feed-server"
           flyctl secrets set --stage --app "$APP_NAME" "UPSTASH_URL=$UPSTASH_URL"
           flyctl secrets set --stage --app "$APP_NAME" "UPSTASH_TOKEN=$UPSTASH_TOKEN"
           flyctl secrets set --stage --app "$APP_NAME" PROJECT="hot-or-not-feed-intelligence"
