@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use yral_ml_feed_cache::{
     consts::{
         MAX_WATCH_HISTORY_CACHE_LEN, USER_SUCCESS_HISTORY_CLEAN_SUFFIX,
@@ -55,6 +57,18 @@ pub async fn get_ml_feed_clean_impl(
         })
         .collect::<Vec<ml_feed_py::SuccessHistoryItem>>();
 
+    // Create a HashSet of video_ids from filter_results, watch history, and success history
+    let mut filter_video_ids: HashSet<String> = filter_results
+        .iter()
+        .map(|item| item.video_id.clone())
+        .collect();
+    
+    // Add watch history video_ids
+    filter_video_ids.extend(watch_history.iter().map(|item| item.video_id.clone()));
+    
+    // Add success history video_ids
+    filter_video_ids.extend(success_history.iter().map(|item| item.video_id.clone()));
+
     let filter_items = filter_results
         .iter()
         .map(|x| ml_feed_py::MlPostItem {
@@ -94,6 +108,7 @@ pub async fn get_ml_feed_clean_impl(
     let response_items = response_obj
         .feed
         .iter()
+        .filter(|x| !filter_video_ids.contains(&x.video_id))
         .map(|x| PostItem {
             canister_id: x.canister_id.clone(),
             post_id: x.post_id as u64,
@@ -146,6 +161,18 @@ pub async fn get_ml_feed_nsfw_impl(
         })
         .collect::<Vec<ml_feed_py::SuccessHistoryItem>>();
 
+    // Create a HashSet of video_ids from filter_results, watch history, and success history
+    let mut filter_video_ids: HashSet<String> = filter_results
+        .iter()
+        .map(|item| item.video_id.clone())
+        .collect();
+    
+    // Add watch history video_ids
+    filter_video_ids.extend(watch_history.iter().map(|item| item.video_id.clone()));
+    
+    // Add success history video_ids
+    filter_video_ids.extend(success_history.iter().map(|item| item.video_id.clone()));
+
     let filter_items = filter_results
         .iter()
         .map(|x| ml_feed_py::MlPostItem {
@@ -185,6 +212,7 @@ pub async fn get_ml_feed_nsfw_impl(
     let response_items = response_obj
         .feed
         .iter()
+        .filter(|x| !filter_video_ids.contains(&x.video_id))
         .map(|x| PostItem {
             canister_id: x.canister_id.clone(),
             post_id: x.post_id as u64,
@@ -259,6 +287,20 @@ pub async fn get_ml_feed_mixed_impl(
         })
         .collect::<Vec<ml_feed_py::SuccessHistoryItem>>();
 
+    // Create a HashSet of video_ids from filter_results and all history data
+    let mut filter_video_ids: HashSet<String> = filter_results
+        .iter()
+        .map(|item| item.video_id.clone())
+        .collect();
+    
+    // Add watch history video_ids (both clean and nsfw)
+    filter_video_ids.extend(watch_history_clean.iter().map(|item| item.video_id.clone()));
+    filter_video_ids.extend(watch_history_nsfw.iter().map(|item| item.video_id.clone()));
+    
+    // Add success history video_ids (both clean and nsfw)
+    filter_video_ids.extend(success_history_clean.iter().map(|item| item.video_id.clone()));
+    filter_video_ids.extend(success_history_nsfw.iter().map(|item| item.video_id.clone()));
+
     let filter_items = filter_results
         .iter()
         .map(|x| ml_feed_py::MlPostItem {
@@ -298,6 +340,7 @@ pub async fn get_ml_feed_mixed_impl(
     let response_items = response_obj
         .feed
         .iter()
+        .filter(|x| !filter_video_ids.contains(&x.video_id))
         .map(|x| PostItem {
             canister_id: x.canister_id.clone(),
             post_id: x.post_id as u64,
