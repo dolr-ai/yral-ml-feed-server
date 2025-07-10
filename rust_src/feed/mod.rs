@@ -30,6 +30,7 @@ use yral_ml_feed_cache::{
 };
 
 pub mod utils;
+pub mod v2;
 
 use crate::{utils::remove_duplicates, AppState};
 
