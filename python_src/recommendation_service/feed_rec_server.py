@@ -18,6 +18,7 @@ from grpc_reflection.v1alpha import reflection
 from recommendation_service import video_recommendation_pb2
 from recommendation_service import video_recommendation_pb2_grpc
 
+from report_video_v3 import ReportVideoV3
 from utils.upstash_utils import UpstashUtils
 from simple_recommendation_v0 import SimpleRecommendationV0
 from clean_recommendation_v0 import CleanRecommendationV0
@@ -93,6 +94,7 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         )
         self.nsfw_recommender_report_filtered_v0 = NsfwRecommendationReportFilteredV0()
         self.report_handler = ReportVideoV0()
+        self.report_handler_v3 = ReportVideoV3()
         # Initialize v2 recommenders
         self.clean_recommender_v2 = CleanRecommendationV2()
         self.nsfw_recommender_v2 = NsfwRecommendationV2()
@@ -418,7 +420,7 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         video_id = request.video_id
         reason = request.reason
 
-        success = self.report_handler.report_video_v3(
+        success = self.report_handler_v3.report_video_v3(
             reportee_user_id=reportee_user_id,
             video_id=video_id,
             reason=reason,
