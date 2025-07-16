@@ -1,4 +1,4 @@
-FROM python:3.9.14-buster
+FROM python:3.14.0b4-bookworm
 
 
 WORKDIR /app
