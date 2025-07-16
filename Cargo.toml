@@ -56,12 +56,12 @@ yral-metadata-client = { git = "https://github.com/yral-dapp/yral-metadata.git",
 yral-metadata-types = { git = "https://github.com/yral-dapp/yral-metadata", branch = "master", version = "0.1.0" }
 
 # yral-common
-# yral-ml-feed-cache = { git = "https://github.com/yral-dapp/yral-common", branch = "master", package = "ml-feed-cache" } 
-# yral-types = { git = "https://github.com/yral-dapp/yral-common", branch = "master" }
+yral-ml-feed-cache = { git = "https://github.com/yral-dapp/yral-common", rev = "58e82be4dbe7231768dc61288a9fc5056d39859b", package = "ml-feed-cache" }
+yral-types = { git = "https://github.com/yral-dapp/yral-common", rev = "58e82be4dbe7231768dc61288a9fc5056d39859b" }
 
 # yral-common local
-yral-ml-feed-cache = { path = "../yral-common/ml-feed-cache", package = "ml-feed-cache" }
-yral-types = { path = "../yral-common/types" }
+# yral-ml-feed-cache = { path = "../yral-common/ml-feed-cache", package = "ml-feed-cache" }
+# yral-types = { path = "../yral-common/types" }
 
 [build-dependencies]
 serde = { version = "1.0", features = ["derive"] }
