@@ -29,6 +29,7 @@ use yral_ml_feed_cache::{
     types::{FeedRequest, FeedResponse},
 };
 
+pub mod feed_v3;
 pub mod utils;
 
 use crate::{utils::remove_duplicates, AppState};
@@ -59,6 +60,7 @@ pub fn feed_router(state: Arc<AppState>) -> OpenApiRouter {
         (status = 500, description = "Internal server error"),
     )
 )]
+#[deprecated]
 #[instrument(skip(state, payload), fields(canister_id = %payload.canister_id))]
 async fn get_feed_coldstart_clean_v2(
     State(state): State<Arc<AppState>>,
@@ -130,6 +132,7 @@ async fn get_feed_coldstart_clean_v2(
         (status = 500, description = "Internal server error"),
     )
 )]
+#[deprecated]
 #[instrument(skip(state, payload), fields(canister_id = %payload.canister_id))]
 async fn get_feed_coldstart_nsfw_v2(
     State(state): State<Arc<AppState>>,
@@ -201,6 +204,7 @@ async fn get_feed_coldstart_nsfw_v2(
         (status = 500, description = "Internal server error"),
     )
 )]
+#[deprecated]
 #[instrument(skip(state, payload), fields(canister_id = %payload.canister_id))]
 async fn get_feed_coldstart_mixed_v2(
     State(state): State<Arc<AppState>>,
@@ -270,6 +274,7 @@ async fn get_feed_coldstart_mixed_v2(
         (status = 500, description = "Internal server error"),
     )
 )]
+#[deprecated]
 #[instrument(skip(state, payload), fields(canister_id = %payload.canister_id))]
 async fn get_feed_clean_v2(
     State(state): State<Arc<AppState>>,
@@ -326,6 +331,7 @@ async fn get_feed_clean_v2(
         (status = 500, description = "Internal server error"),
     )
 )]
+#[deprecated]
 #[instrument(skip(state, payload), fields(canister_id = %payload.canister_id))]
 async fn get_feed_nsfw_v2(
     State(state): State<Arc<AppState>>,
@@ -382,6 +388,7 @@ async fn get_feed_nsfw_v2(
         (status = 500, description = "Internal server error"),
     )
 )]
+#[deprecated]
 #[instrument(skip(state, payload), fields(canister_id = %payload.canister_id))]
 async fn get_feed_mixed_v2(
     State(state): State<Arc<AppState>>,
@@ -437,6 +444,7 @@ async fn get_feed_mixed_v2(
         (status = 500, description = "Internal server error"),
     )
 )]
+#[deprecated]
 #[instrument(skip(state))]
 async fn update_global_cache_clean(
     State(state): State<Arc<AppState>>,
@@ -470,6 +478,7 @@ async fn update_global_cache_clean(
         (status = 500, description = "Internal server error"),
     )
 )]
+#[deprecated]
 #[instrument(skip(state))]
 async fn update_global_cache_nsfw(
     State(state): State<Arc<AppState>>,
@@ -503,6 +512,7 @@ async fn update_global_cache_nsfw(
         (status = 500, description = "Internal server error"),
     )
 )]
+#[deprecated]
 #[instrument(skip(state))]
 async fn update_global_cache_mixed(
     State(state): State<Arc<AppState>>,
@@ -525,3 +535,4 @@ async fn update_global_cache_mixed(
 
     Ok(())
 }
+

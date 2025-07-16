@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use yral_ml_feed_cache::types::PostItem;
+use yral_types::post::PostItemV2;
 
 use crate::canister::individual_user_template::SystemTime;
 
@@ -25,4 +26,13 @@ pub fn remove_duplicates(posts: Vec<PostItem>) -> Vec<PostItem> {
         .into_iter()
         .filter(|post| seen.insert((post.canister_id.clone(), post.post_id)))
         .collect::<Vec<PostItem>>()
+}
+
+pub fn remove_duplicates_v2(posts: Vec<PostItemV2>) -> Vec<PostItemV2> {
+    let mut seen = std::collections::HashSet::new();
+
+    posts
+        .into_iter()
+        .filter(|post| seen.insert(post.video_id.clone()))
+        .collect::<Vec<PostItemV2>>()
 }

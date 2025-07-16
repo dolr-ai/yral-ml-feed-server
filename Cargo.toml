@@ -16,7 +16,7 @@ tower-http = { version = "0.6.2", default-features = false, features = [
 tower = { version = "0.5.1", features = ["full"] }
 candid = "0.10.6"
 serde_bytes = "0.11.14"
-ic-agent = "0.33.0"
+ic-agent = { version = "0.38.1", default-features = false }
 serde = "1.0.197"
 serde_json = "1.0.114"
 chrono = "0.4.38"
@@ -29,10 +29,9 @@ reqwest = { version = "0.12.9", features = [
 axum = { version = "0.8.0", features = ["macros", "json"] }
 utoipa = "5.3.1"
 utoipa-axum = "0.2.0"
-utoipa-swagger-ui = { version = "9.0.1", features = ["axum"] }
+utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
 log = "0.4.21"
 env_logger = "0.11.3"
-yral-ml-feed-cache = { git = "https://github.com/yral-dapp/yral-common", rev = "088a871f986236bab45ff89e68886f4c8d802449", package = "ml-feed-cache" } # yral-ml-feed-cache = { path = "../yral-common/ml-feed-cache", package = "ml-feed-cache" }
 rand = "0.9.0"
 sentry = { version = "0.37.0", default-features = false, features = [
     "rustls",
@@ -51,6 +50,18 @@ sentry-tracing = "0.37.0"
 tracing-log = "0.2.0"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 tracing-futures = "0.2.5"
+yral-metadata-client = { git = "https://github.com/yral-dapp/yral-metadata.git", features = [
+    "rustls-tls",
+], default-features = false }
+yral-metadata-types = { git = "https://github.com/yral-dapp/yral-metadata", branch = "master", version = "0.1.0" }
+
+# yral-common
+# yral-ml-feed-cache = { git = "https://github.com/yral-dapp/yral-common", branch = "master", package = "ml-feed-cache" } 
+# yral-types = { git = "https://github.com/yral-dapp/yral-common", branch = "master" }
+
+# yral-common local
+yral-ml-feed-cache = { path = "../yral-common/ml-feed-cache", package = "ml-feed-cache" }
+yral-types = { path = "../yral-common/types" }
 
 [build-dependencies]
 serde = { version = "1.0", features = ["derive"] }

@@ -43,6 +43,7 @@ async fn main_impl() -> Result<()> {
 
     let (router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .nest("/api/v1/feed", feed::feed_router(app_state.clone()))
+        .nest("/api/v3/feed", feed::feed_v3::feed_v3_router(app_state.clone()))
         .split_for_parts();
 
     let router =
