@@ -65,6 +65,58 @@ message VideoReportResponse {
 
 
 
+message VideoReportRequestV3 {
+  string reportee_user_id = 1;
+  string video_id = 2;
+  string reason = 3;
+}
+
+message VideoReportResponseV3 {
+  bool success = 1;
+}
+
+
+
+message MLPostItemV3 {
+  uint32 post_id = 1;
+  string publisher_user_id = 2;
+  string video_id = 3;
+}
+
+message MLPostItemResponseV3 {
+  uint32 post_id = 1;
+  string publisher_user_id = 2;
+  float nsfw_probability = 3;
+  string video_id = 4;
+}
+
+message WatchHistoryItemV3 {
+  uint32 post_id = 1;
+  string publisher_user_id = 2;
+  string video_id = 3;
+  float percent_watched = 4;
+  string timestamp = 5;
+}
+
+message SuccessHistoryItemV3 {
+  uint32 post_id = 1;
+  string publisher_user_id = 2;
+  string video_id = 3;
+  string item_type = 4;
+  float percent_watched = 5;
+  string timestamp = 6;
+}
+
+message MLFeedRequestV3 {
+  string user_principal_id = 1;
+  repeated WatchHistoryItemV3 watch_history = 2;
+  repeated SuccessHistoryItemV3 success_history = 3;
+  repeated MLPostItemV3 filter_posts = 4;
+  uint32 num_results = 5;
+}
+
+message MLFeedResponseV3 { repeated MLPostItemResponseV3 feed = 1; }
+
 service MLFeed {
   rpc get_ml_feed(MLFeedRequest) returns (MLFeedResponse) {}
   rpc get_ml_feed_clean(MLFeedRequest) returns (MLFeedResponse) {}
@@ -78,4 +130,9 @@ service MLFeed {
   rpc get_ml_feed_clean_v2_deduped(MLFeedRequest) returns (MLFeedResponseV2) {}
   rpc get_ml_feed_nsfw_v2_deduped(MLFeedRequest) returns (MLFeedResponseV2) {}
   rpc get_ml_feed_combined_deduped(MLFeedRequest) returns (MLFeedResponseV2) {}
-} 
+
+  rpc get_ml_feed_clean_v3(MLFeedRequestV3) returns (MLFeedResponseV3) {}
+  rpc get_ml_feed_nsfw_v3(MLFeedRequestV3) returns (MLFeedResponseV3) {}
+  rpc get_ml_feed_combined_v3(MLFeedRequestV3) returns (MLFeedResponseV3) {}
+  rpc report_video_v3(VideoReportRequestV3) returns (VideoReportResponseV3) {}
+}
