@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use candid::Principal;
+use tracing::instrument;
 use yral_metadata_client::MetadataClient;
 use yral_ml_feed_cache::{
     consts::{
@@ -18,6 +19,7 @@ use crate::{
     utils::{remove_duplicates_v2, to_rfc3339},
 };
 
+#[instrument(skip(ml_feed_cache, metadata_client, filter_results))]
 pub async fn get_ml_feed_clean_v3_impl(
     ml_feed_cache: MLFeedCacheState,
     user_id: String,
@@ -107,6 +109,7 @@ pub async fn get_ml_feed_clean_v3_impl(
         .map_err(|e| anyhow::anyhow!("Failed to get get_ml_feed_clean_v3 response: {}", e))?;
 
     let response_obj = response.into_inner();
+    let original_response_len = response_obj.feed.len();
 
     let response_items = response_obj
         .feed
@@ -121,6 +124,15 @@ pub async fn get_ml_feed_clean_v3_impl(
         })
         .collect::<Vec<PostItemV2>>();
 
+    if response_items.len() < original_response_len {
+        tracing::warn!(
+            "Removed {} duplicate posts, original: {}, filtered: {}",
+            original_response_len - response_items.len(),
+            original_response_len,
+            response_items.len()
+        );
+    }
+
     // Fill canister_ids and filter out posts without metadata
     let mut response_items = fill_canister_ids(response_items, metadata_client).await?;
 
@@ -129,6 +141,7 @@ pub async fn get_ml_feed_clean_v3_impl(
     Ok(response_items)
 }
 
+#[instrument(skip(ml_feed_cache, metadata_client, filter_results))]
 pub async fn get_ml_feed_nsfw_v3_impl(
     ml_feed_cache: MLFeedCacheState,
     user_id: String,
@@ -218,6 +231,7 @@ pub async fn get_ml_feed_nsfw_v3_impl(
         .map_err(|e| anyhow::anyhow!("Failed to get get_ml_feed_nsfw_v3 response: {}", e))?;
 
     let response_obj = response.into_inner();
+    let original_response_len = response_obj.feed.len();
 
     let response_items = response_obj
         .feed
@@ -232,6 +246,15 @@ pub async fn get_ml_feed_nsfw_v3_impl(
         })
         .collect::<Vec<PostItemV2>>();
 
+    if response_items.len() < original_response_len {
+        tracing::warn!(
+            "Removed {} duplicate posts, original: {}, filtered: {}",
+            original_response_len - response_items.len(),
+            original_response_len,
+            response_items.len()
+        );
+    }
+
     // Fill canister_ids and filter out posts without metadata
     let mut response_items = fill_canister_ids(response_items, metadata_client).await?;
 
@@ -240,6 +263,7 @@ pub async fn get_ml_feed_nsfw_v3_impl(
     Ok(response_items)
 }
 
+#[instrument(skip(metadata_client, posts))]
 pub async fn fill_canister_ids(
     posts: Vec<PostItemV2>,
     metadata_client: &MetadataClient<false>,
@@ -263,6 +287,7 @@ pub async fn fill_canister_ids(
         .map_err(|e| anyhow::anyhow!("Failed to get user metadata bulk: {}", e))?;
 
     // Filter posts and fill canister_ids for posts with metadata
+    let original_posts_len = posts.len();
     let filtered_posts: Vec<PostItemV2> = posts
         .into_iter()
         .filter_map(|mut post| {
@@ -275,6 +300,15 @@ pub async fn fill_canister_ids(
             None
         })
         .collect();
+
+    if filtered_posts.len() < original_posts_len {
+        tracing::warn!(
+            "Removed {} posts without metadata, original: {}, filtered: {}",
+            original_posts_len - filtered_posts.len(),
+            original_posts_len,
+            filtered_posts.len()
+        );
+    }
 
     Ok(filtered_posts)
 }

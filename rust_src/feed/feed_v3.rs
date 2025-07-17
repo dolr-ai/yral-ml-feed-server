@@ -202,7 +202,7 @@ async fn get_feed_clean_v3(
     let feed = get_ml_feed_clean_v3_impl(
         state.ml_feed_cache.clone(),
         user_id.to_text(),
-        payload.filter_results,
+        payload.filter_results.clone(),
         payload.num_results + 100,
         &state.yral_metadata_client,
     )
@@ -238,6 +238,20 @@ async fn get_feed_clean_v3(
         }));
     }
 
+    if feed.is_empty() {
+        tracing::error!(
+            "Feed is empty, requested: {}, returned: 0 ; filter res: {:?}",
+            payload.num_results,
+            payload.filter_results
+        );
+    } else if feed.len() < payload.num_results as usize {
+        tracing::warn!(
+            "Feed length less than requested, requested: {}, returned: {}",
+            payload.num_results,
+            feed.len()
+        );
+    }
+
     Ok(Json(FeedResponseV2 { posts: feed }))
 }
 
@@ -261,7 +275,7 @@ async fn get_feed_nsfw_v3(
     let feed = get_ml_feed_nsfw_v3_impl(
         state.ml_feed_cache.clone(),
         user_id.to_string(),
-        payload.filter_results,
+        payload.filter_results.clone(),
         payload.num_results + 100,
         &state.yral_metadata_client,
     )
@@ -295,6 +309,20 @@ async fn get_feed_nsfw_v3(
         return Ok(Json(FeedResponseV2 {
             posts: first_part.to_vec(),
         }));
+    }
+
+    if feed.is_empty() {
+        tracing::error!(
+            "Feed is empty, requested: {}, returned: 0 ; filter res: {:?}",
+            payload.num_results,
+            payload.filter_results
+        );
+    } else if feed.len() < payload.num_results as usize {
+        tracing::warn!(
+            "Feed length less than requested, requested: {}, returned: {}",
+            payload.num_results,
+            feed.len()
+        );
     }
 
     Ok(Json(FeedResponseV2 { posts: feed }))

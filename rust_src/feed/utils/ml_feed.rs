@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use tracing::instrument;
 use yral_ml_feed_cache::{
     consts::{
         MAX_WATCH_HISTORY_CACHE_LEN, USER_SUCCESS_HISTORY_CLEAN_SUFFIX,
@@ -16,6 +17,7 @@ use crate::{
     utils::to_rfc3339,
 };
 
+#[instrument(skip(ml_feed_cache, filter_results))]
 pub async fn get_ml_feed_clean_impl(
     ml_feed_cache: MLFeedCacheState,
     canister_id: String,
@@ -62,10 +64,10 @@ pub async fn get_ml_feed_clean_impl(
         .iter()
         .map(|item| item.video_id.clone())
         .collect();
-    
+
     // Add watch history video_ids
     filter_video_ids.extend(watch_history.iter().map(|item| item.video_id.clone()));
-    
+
     // Add success history video_ids
     filter_video_ids.extend(success_history.iter().map(|item| item.video_id.clone()));
 
@@ -105,6 +107,8 @@ pub async fn get_ml_feed_clean_impl(
 
     let response_obj = response.into_inner();
 
+    let original_response_len = response_obj.feed.len();
+
     let response_items = response_obj
         .feed
         .iter()
@@ -117,9 +121,19 @@ pub async fn get_ml_feed_clean_impl(
         })
         .collect::<Vec<PostItem>>();
 
+    if response_items.len() < original_response_len {
+        tracing::warn!(
+            "Removed {} duplicate posts, original: {}, filtered: {}",
+            original_response_len - response_items.len(),
+            original_response_len,
+            response_items.len()
+        );
+    }
+
     Ok(response_items)
 }
 
+#[instrument(skip(ml_feed_cache, filter_results))]
 pub async fn get_ml_feed_nsfw_impl(
     ml_feed_cache: MLFeedCacheState,
     canister_id: String,
@@ -166,10 +180,10 @@ pub async fn get_ml_feed_nsfw_impl(
         .iter()
         .map(|item| item.video_id.clone())
         .collect();
-    
+
     // Add watch history video_ids
     filter_video_ids.extend(watch_history.iter().map(|item| item.video_id.clone()));
-    
+
     // Add success history video_ids
     filter_video_ids.extend(success_history.iter().map(|item| item.video_id.clone()));
 
@@ -208,6 +222,7 @@ pub async fn get_ml_feed_nsfw_impl(
         .map_err(|e| anyhow::anyhow!("Failed to get ml_feed_py response: {}", e))?;
 
     let response_obj = response.into_inner();
+    let original_response_len = response_obj.feed.len();
 
     let response_items = response_obj
         .feed
@@ -221,9 +236,19 @@ pub async fn get_ml_feed_nsfw_impl(
         })
         .collect::<Vec<PostItem>>();
 
+    if response_items.len() < original_response_len {
+        tracing::warn!(
+            "Removed {} duplicate posts, original: {}, filtered: {}",
+            original_response_len - response_items.len(),
+            original_response_len,
+            response_items.len()
+        );
+    }
+
     Ok(response_items)
 }
 
+#[instrument(skip(ml_feed_cache, filter_results))]
 pub async fn get_ml_feed_mixed_impl(
     ml_feed_cache: MLFeedCacheState,
     canister_id: String,
@@ -292,14 +317,22 @@ pub async fn get_ml_feed_mixed_impl(
         .iter()
         .map(|item| item.video_id.clone())
         .collect();
-    
+
     // Add watch history video_ids (both clean and nsfw)
     filter_video_ids.extend(watch_history_clean.iter().map(|item| item.video_id.clone()));
     filter_video_ids.extend(watch_history_nsfw.iter().map(|item| item.video_id.clone()));
-    
+
     // Add success history video_ids (both clean and nsfw)
-    filter_video_ids.extend(success_history_clean.iter().map(|item| item.video_id.clone()));
-    filter_video_ids.extend(success_history_nsfw.iter().map(|item| item.video_id.clone()));
+    filter_video_ids.extend(
+        success_history_clean
+            .iter()
+            .map(|item| item.video_id.clone()),
+    );
+    filter_video_ids.extend(
+        success_history_nsfw
+            .iter()
+            .map(|item| item.video_id.clone()),
+    );
 
     let filter_items = filter_results
         .iter()
@@ -336,6 +369,7 @@ pub async fn get_ml_feed_mixed_impl(
         .map_err(|e| anyhow::anyhow!("Failed to get ml_feed_py response: {}", e))?;
 
     let response_obj = response.into_inner();
+    let original_response_len = response_obj.feed.len();
 
     let response_items = response_obj
         .feed
@@ -348,6 +382,15 @@ pub async fn get_ml_feed_mixed_impl(
             nsfw_probability: x.nsfw_probability,
         })
         .collect::<Vec<PostItem>>();
+
+    if response_items.len() < original_response_len {
+        tracing::warn!(
+            "Removed {} duplicate posts, original: {}, filtered: {}",
+            original_response_len - response_items.len(),
+            original_response_len,
+            response_items.len()
+        );
+    }
 
     Ok(response_items)
 }

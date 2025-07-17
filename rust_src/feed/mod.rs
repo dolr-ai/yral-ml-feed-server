@@ -284,7 +284,7 @@ async fn get_feed_clean_v2(
     let feed = get_ml_feed_clean_impl(
         state.ml_feed_cache.clone(),
         canister_id.clone(),
-        payload.filter_results,
+        payload.filter_results.clone(),
         payload.num_results + 100,
     )
     .await
@@ -317,6 +317,20 @@ async fn get_feed_clean_v2(
         }));
     }
 
+    if feed.is_empty() {
+        tracing::error!(
+            "Feed is empty, requested: {}, returned: 0 ; filter res: {:?}",
+            payload.num_results,
+            payload.filter_results
+        );
+    } else if feed.len() < payload.num_results as usize {
+        tracing::warn!(
+            "Feed length less than requested, requested: {}, returned: {}",
+            payload.num_results,
+            feed.len()
+        );
+    }
+
     Ok(Json(FeedResponse { posts: feed }))
 }
 
@@ -341,7 +355,7 @@ async fn get_feed_nsfw_v2(
     let feed = get_ml_feed_nsfw_impl(
         state.ml_feed_cache.clone(),
         canister_id.clone(),
-        payload.filter_results,
+        payload.filter_results.clone(),
         payload.num_results + 100,
     )
     .await
@@ -372,6 +386,20 @@ async fn get_feed_nsfw_v2(
         return Ok(Json(FeedResponse {
             posts: first_part.to_vec(),
         }));
+    }
+
+    if feed.is_empty() {
+        tracing::error!(
+            "Feed is empty, requested: {}, returned: 0 ; filter res: {:?}",
+            payload.num_results,
+            payload.filter_results
+        );
+    } else if feed.len() < payload.num_results as usize {
+        tracing::warn!(
+            "Feed length less than requested, requested: {}, returned: {}",
+            payload.num_results,
+            feed.len()
+        );
     }
 
     Ok(Json(FeedResponse { posts: feed }))
@@ -535,4 +563,3 @@ async fn update_global_cache_mixed(
 
     Ok(())
 }
-
