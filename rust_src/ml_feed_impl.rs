@@ -3,8 +3,8 @@ use std::env;
 use std::sync::Arc;
 
 use crate::grpc_services::ml_feed::{
-    FeedRequest, FeedResponse, FeedResponseV1, PostItem, PostItemResponse, VideoReportRequest,
-    VideoReportResponse,
+    FeedRequest, FeedResponse, FeedResponseV1, PostItemResponse, VideoReportRequest,
+    VideoReportRequestV3, VideoReportResponse, VideoReportResponseV3,
 };
 use anyhow::anyhow;
 use candid::Principal;
@@ -16,14 +16,13 @@ use crate::grpc_services::ml_feed_py::ml_feed_client::MlFeedClient;
 use crate::grpc_services::ml_feed_py::{MlFeedRequest, MlFeedResponse};
 use crate::grpc_services::off_chain;
 use crate::grpc_services::off_chain::off_chain_canister_client::OffChainCanisterClient;
-use prost::bytes::buf::Limit;
 use serde::{Deserialize, Serialize};
 use tonic::metadata::MetadataValue;
 use tonic::transport::{Channel, ClientTlsConfig};
 use tonic::{Request, Response, Status};
 
 use crate::consts::{CLOUDFLARE_ML_FEED_CACHE_WORKER_URL, ML_FEED_PY_SERVER, OFF_CHAIN_AGENT};
-use crate::utils::{to_rfc3339, to_rfc3339_did_systemtime};
+use crate::utils::to_rfc3339_did_systemtime;
 use crate::{canister, AppState};
 
 pub struct MLFeedService {
@@ -254,6 +253,38 @@ impl MlFeed for MLFeedService {
             .map_err(|e| Status::internal(format!("Failed to get ml_feed_py response: {}", e)))?;
 
         Ok(Response::new(VideoReportResponse { success: true }))
+    }
+
+    async fn report_video_v3(
+        &self,
+        request: Request<VideoReportRequestV3>,
+    ) -> Result<Response<VideoReportResponseV3>, Status> {
+        let req_obj = request.into_inner();
+
+        let mut client = match MlFeedClient::connect(
+            ML_FEED_PY_SERVER, // http://python_proc.process.yral-ml-feed-server.internal:50059"
+        )
+        .await
+        {
+            Ok(client) => client,
+            Err(e) => {
+                println!("Failed to connect to ml_feed_py server: {:?}", e);
+                return Err(Status::internal("Failed to connect to ml_feed_py server"));
+            }
+        };
+
+        let request = tonic::Request::new(ml_feed_py::VideoReportRequestV3 {
+            reportee_user_id: req_obj.reportee_user_id,
+            video_id: req_obj.video_id,
+            reason: req_obj.reason,
+        });
+
+        let _response = client
+            .report_video_v3(request)
+            .await
+            .map_err(|e| Status::internal(format!("Failed to get ml_feed_py response: {}", e)))?;
+
+        Ok(Response::new(VideoReportResponseV3 { success: true }))
     }
 
     async fn get_feed_global_cache(

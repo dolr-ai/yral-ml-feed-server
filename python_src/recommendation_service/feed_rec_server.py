@@ -18,6 +18,7 @@ from grpc_reflection.v1alpha import reflection
 from recommendation_service import video_recommendation_pb2
 from recommendation_service import video_recommendation_pb2_grpc
 
+from report_video_v3 import ReportVideoV3
 from utils.upstash_utils import UpstashUtils
 from simple_recommendation_v0 import SimpleRecommendationV0
 from clean_recommendation_v0 import CleanRecommendationV0
@@ -35,6 +36,10 @@ from combined_recommendation_v2 import CombinedRecommendationV2
 from clean_recommendation_v2_deduped import CleanRecommendationV2Deduped
 from nsfw_recommendation_v2_deduped import NsfwRecommendationV2Deduped
 from combined_recommendation_v2_deduped import CombinedRecommendationV2Deduped
+
+from clean_recommendation_v3 import CleanRecommendationV3
+from nsfw_recommendation_v3 import NsfwRecommendationV3
+from combined_recommendation_v3 import CombinedRecommendationV3
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -89,6 +94,7 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         )
         self.nsfw_recommender_report_filtered_v0 = NsfwRecommendationReportFilteredV0()
         self.report_handler = ReportVideoV0()
+        self.report_handler_v3 = ReportVideoV3()
         # Initialize v2 recommenders
         self.clean_recommender_v2 = CleanRecommendationV2()
         self.nsfw_recommender_v2 = NsfwRecommendationV2()
@@ -97,6 +103,11 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         self.clean_recommender_v2_deduped = CleanRecommendationV2Deduped()
         self.nsfw_recommender_v2_deduped = NsfwRecommendationV2Deduped()
         self.combined_recommender_v2_deduped = CombinedRecommendationV2Deduped()
+
+        # Initialize v3 recommenders
+        self.clean_recommender_v3 = CleanRecommendationV3()
+        self.nsfw_recommender_v3 = NsfwRecommendationV3()
+        self.combined_recommender_v3 = CombinedRecommendationV3()
         return
 
     def get_ml_feed(self, request, context):
@@ -403,6 +414,79 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         )
 
         return video_recommendation_pb2.VideoReportResponse(success=success)
+
+    def report_video_v3(self, request, context):
+        reportee_user_id = request.reportee_user_id
+        video_id = request.video_id
+        reason = request.reason
+
+        success = self.report_handler_v3.report_video_v3(
+            reportee_user_id=reportee_user_id,
+            video_id=video_id,
+            reason=reason,
+        )
+        
+        return video_recommendation_pb2.VideoReportResponseV3(success=success)
+
+    def get_ml_feed_clean_v3(self, request, context):
+        watch_history_uris = [item.video_id for item in request.watch_history] + [
+            item.video_id for item in request.filter_posts
+        ]
+        successful_plays = [
+            {
+                "video_uri": item.video_id,
+                "item_type": item.item_type,
+                "percent_watched": item.percent_watched,
+            }
+            for item in request.success_history
+        ]
+        num_results = request.num_results
+
+        return self.clean_recommender_v3.get_collated_recommendation(
+            successful_plays=successful_plays,
+            watch_history_uris=watch_history_uris,
+            num_results=num_results,
+        )
+    
+    def get_ml_feed_nsfw_v3(self, request, context):
+        watch_history_uris = [item.video_id for item in request.watch_history] + [
+            item.video_id for item in request.filter_posts
+        ]
+        successful_plays = [
+            {
+                "video_uri": item.video_id, 
+                "item_type": item.item_type,
+                "percent_watched": item.percent_watched,
+            }
+            for item in request.success_history
+        ]
+        num_results = request.num_results
+
+        return self.nsfw_recommender_v3.get_collated_recommendation(
+            successful_plays=successful_plays,
+            watch_history_uris=watch_history_uris,
+            num_results=num_results,
+        )
+    
+    def get_ml_feed_combined_v3(self, request, context):
+        watch_history_uris = [item.video_id for item in request.watch_history] + [
+            item.video_id for item in request.filter_posts
+        ]
+        successful_plays = [
+            {
+                "video_uri": item.video_id,
+                "item_type": item.item_type,
+                "percent_watched": item.percent_watched,
+            }
+            for item in request.success_history
+        ]
+        num_results = request.num_results
+
+        return self.combined_recommender_v3.get_collated_recommendation(
+            successful_plays=successful_plays,
+            watch_history_uris=watch_history_uris,
+            num_results=num_results,
+        )
 
 
 def _wait_forever(server):

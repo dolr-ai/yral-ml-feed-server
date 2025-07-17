@@ -175,3 +175,4 @@ dedupe_url_testing.py
 analyze_duplicated_payload_responses.py
 jay_exp
 analyze_payload_based_on_video_unique_table.py
+bigquery_schema.txt
