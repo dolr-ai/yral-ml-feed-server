@@ -116,7 +116,7 @@ class ReportVideoV3:
                     "video_canister_id": "",
                     "video_post_id": "",
                     "video_uri": str(
-                        video_id
+                        f"gs://yral-videos/{video_id}.mp4"
                     ), 
                     "parent_video_canister_id": "",
                     "parent_video_post_id": "",

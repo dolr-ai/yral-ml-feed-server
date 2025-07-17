@@ -114,6 +114,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
         ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
         successful_plays = [
             {
                 "video_uri": item.video_id,
@@ -133,6 +137,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
     def get_ml_feed_clean(self, request, context):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
         ]
         # successful_plays_uris = [item.video_id for item in request.success_history]
         successful_plays = [
@@ -155,6 +163,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
         ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
         successful_plays = [
             {
                 "video_uri": item.video_id,
@@ -174,6 +186,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
     def get_ml_feed_clean_v0(self, request, context):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
         ]
         successful_plays = [
             {
@@ -197,6 +213,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
         ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
         successful_plays = [
             {
                 "video_uri": item.video_id,
@@ -218,6 +238,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
     def get_ml_feed_clean_v1(self, request, context):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
         ]
         successful_plays = [
             {
@@ -241,6 +265,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
         ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
         successful_plays = [
             {
                 "video_uri": item.video_id,
@@ -262,6 +290,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
     def get_ml_feed_clean_v2(self, request, context):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
         ]
         successful_plays = [
             {
@@ -285,6 +317,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
         ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
         successful_plays = [
             {
                 "video_uri": item.video_id,
@@ -306,6 +342,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
     def get_ml_feed_combined(self, request, context):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
         ]
         successful_plays = [
             {
@@ -329,6 +369,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
         ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
         successful_plays = [
             {
                 "video_uri": item.video_id,
@@ -351,6 +395,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
         ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
         successful_plays = [
             {
                 "video_uri": item.video_id,
@@ -372,6 +420,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
     def get_ml_feed_combined_deduped(self, request, context):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
         ]
         successful_plays = [
             {
@@ -432,6 +484,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
         ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
         successful_plays = [
             {
                 "video_uri": item.video_id,
@@ -452,6 +508,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
         ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
         successful_plays = [
             {
                 "video_uri": item.video_id, 
@@ -471,6 +531,10 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
     def get_ml_feed_combined_v3(self, request, context):
         watch_history_uris = [item.video_id for item in request.watch_history] + [
             item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
         ]
         successful_plays = [
             {
