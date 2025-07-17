@@ -83,13 +83,15 @@ pub async fn get_ml_feed_clean_v3_impl(
         })
         .collect::<Vec<ml_feed_py::MlPostItemV3>>();
 
-    let request = tonic::Request::new(ml_feed_py::MlFeedRequestV3 {
+    let request_data = ml_feed_py::MlFeedRequestV3 {
         user_principal_id: user_id,
         watch_history: watch_history_items,
         success_history: success_history_items,
         filter_posts: filter_items,
         num_results,
-    });
+    };
+
+    let request = tonic::Request::new(request_data.clone());
 
     let mut client = match MlFeedClient::connect(
         ML_FEED_PY_SERVER, // http://python_proc.process.yral-ml-feed-server.internal:50059"
@@ -126,11 +128,15 @@ pub async fn get_ml_feed_clean_v3_impl(
 
     if response_items.len() < original_response_len {
         tracing::warn!(
-            "Removed {} duplicate posts, original: {}, filtered: {}",
+            "Removed {} posts after explicit filtering, original: {}, filtered: {}",
             original_response_len - response_items.len(),
             original_response_len,
             response_items.len()
         );
+
+        if original_response_len - response_items.len() > 20 {
+            tracing::error!("HIGH_FILTER_RATE_ALERT: Request details: {:?}", request_data);
+        }
     }
 
     // Fill canister_ids and filter out posts without metadata
@@ -205,13 +211,15 @@ pub async fn get_ml_feed_nsfw_v3_impl(
         })
         .collect::<Vec<ml_feed_py::MlPostItemV3>>();
 
-    let request = tonic::Request::new(ml_feed_py::MlFeedRequestV3 {
+    let request_data = ml_feed_py::MlFeedRequestV3 {
         user_principal_id: user_id,
         watch_history: watch_history_items,
         success_history: success_history_items,
         filter_posts: filter_items,
         num_results,
-    });
+    };
+
+    let request = tonic::Request::new(request_data.clone());
 
     let mut client = match MlFeedClient::connect(
         ML_FEED_PY_SERVER, // http://python_proc.process.yral-ml-feed-server.internal:50059"
@@ -248,11 +256,15 @@ pub async fn get_ml_feed_nsfw_v3_impl(
 
     if response_items.len() < original_response_len {
         tracing::warn!(
-            "Removed {} duplicate posts, original: {}, filtered: {}",
+            "Removed {} posts after explicit filtering, original: {}, filtered: {}",
             original_response_len - response_items.len(),
             original_response_len,
             response_items.len()
         );
+
+        if original_response_len - response_items.len() > 20 {
+            tracing::error!("HIGH_FILTER_RATE_ALERT: Request details: {:?}", request_data);
+        }
     }
 
     // Fill canister_ids and filter out posts without metadata
