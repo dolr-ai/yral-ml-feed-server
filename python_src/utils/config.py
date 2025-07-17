@@ -12,7 +12,7 @@ class Config:
             "project": os.getenv("PROJECT"),
             "service_cred": os.getenv("SERVICE_CRED"),
             "video_bucket_name": os.getenv("GS_VIDEO_BUCKET"),
-            "logging": False, # TODO: stage change book mark
+            "logging": True, # TODO: stage change book mark
             "log_dir": os.getenv("LOG_DIR")
         }
 
