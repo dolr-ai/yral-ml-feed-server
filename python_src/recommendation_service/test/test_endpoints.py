@@ -1,3 +1,4 @@
+## 
 import random
 import time
 
@@ -61,7 +62,7 @@ def _build_v2_request(num_results: int = NUM_RESULTS):  # type: ignore
 
 def _build_v3_request(num_results: int = NUM_RESULTS):  # type: ignore
     """Construct a MLFeedRequestV3 for the v3 API family using hard-coded data."""
-    watch_history = [pb.WatchHistoryItemV3(video_id=vid) for vid in VIDEO_IDS[:6]]
+    watch_history = [pb.WatchHistoryItemV3(video_id=vid) for vid in WATCH_HISTORY_VIDEO_IDS]
 
     success_history = [
         pb.SuccessHistoryItemV3(
@@ -138,6 +139,7 @@ def test_get_ml_feed_clean_v3(request=_build_v3_request()) -> None:
     response: pb.MLFeedResponseV3 = stub.get_ml_feed_clean_v3(request)
     _pretty_print_feed(response.feed, "CLEAN FEED V3")
     assert isinstance(response, pb.MLFeedResponseV3)
+    return response
 
 
 def test_get_ml_feed_nsfw_v3(request=_build_v3_request()) -> None:
@@ -168,31 +170,55 @@ def test_report_video_v3() -> None:
 
 
 
-##
-if __name__ == "__main__":
+def get_results_v2():
+    """Get and analyze results from v2 endpoints."""
     start = time.time()
-    print("Running local endpoint smoke tests…")
+    print("Running v2 endpoint tests…")
     request = _build_v2_request()
 
-    response = test_get_ml_feed_clean_v2()
-    print(response)
+    response = test_get_ml_feed_clean_v2(request)
     # test_get_ml_feed_nsfw_v2()
     # test_get_ml_feed_combined_v2()
     video_id_out = [item.video_id for item in response.feed]
     print(set(WATCH_HISTORY_VIDEO_IDS).intersection(video_id_out))
 
-    # test_get_ml_feed_clean_v3()
-    # test_get_ml_feed_nsfw_v3()
-    # test_get_ml_feed_combined_v3()
-
-    # test_report_video_v3()
-
-    print(f"Completed in {time.time() - start:.2f}s")
+    print(f"V2 completed in {time.time() - start:.2f}s")
 
     # checking duplicacy in response
-
     video_id_out = [item.video_id for item in response.feed]
-    print(set(WATCH_HISTORY_VIDEO_IDS).intersection(video_id_out))
+    print(f"Intersection of watch history and video ids: {set(WATCH_HISTORY_VIDEO_IDS).intersection(video_id_out)}")
+    return response
 
 
+def get_results_v3():
+    """Get and analyze results from v3 endpoints."""
+    start = time.time()
+    print("Running v3 endpoint tests…")
+    request = _build_v3_request()
+    
+    response = test_get_ml_feed_clean_v3(request)
+    # test_get_ml_feed_nsfw_v3()
+    # test_get_ml_feed_combined_v3()
+    video_id_out = [item.video_id for item in response.feed]
+    print(f"Intersection of watch history and video ids: {set(WATCH_HISTORY_VIDEO_IDS).intersection(video_id_out)}")
 
+    print(f"V3 completed in {time.time() - start:.2f}s")
+
+    return response
+
+##
+
+if __name__ == "__main__":
+    start = time.time()
+    print("Running local endpoint smoke tests…")
+
+    
+    response_v2 = get_results_v2()
+
+    request_v3 = _build_v3_request(num_results=100)
+    response_v3 = get_results_v3()
+
+    print(f"All tests completed in {time.time() - start:.2f}s")
+
+
+##
