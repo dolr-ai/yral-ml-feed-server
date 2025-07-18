@@ -114,7 +114,7 @@ def _pretty_print_feed(feed, title: str) -> None:
 def test_get_ml_feed_clean_v2(request=_build_v2_request()) -> None:
     """Call get_ml_feed_clean_v2 and assert that a non-empty feed is returned."""
     stub = _get_stub()
-    response: pb.MLFeedResponseV2 = stub.get_ml_feed_clean_v2(request)
+    response: pb.MLFeedResponseV2 = stub.get_ml_feed_clean_v2_deduped(request)
     _pretty_print_feed(response.feed, "CLEAN FEED V2")
     assert isinstance(response, pb.MLFeedResponseV2)
     return response
