@@ -14,7 +14,7 @@ def run(port=50059):
         # return
 
         request = video_recommendation_pb2.VideoReportRequestV3(
-            reportee_user_id="test_user_jay_v3",
+            reportee_user_id="test_user_j_v3",
             video_id="ed7c4c50e46140e9985abd12eccd64ca",
             reason="test_reason_v3",
         )
