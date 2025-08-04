@@ -41,6 +41,10 @@ from clean_recommendation_v3 import CleanRecommendationV3
 from nsfw_recommendation_v3 import NsfwRecommendationV3
 from combined_recommendation_v3 import CombinedRecommendationV3
 
+from clean_recommendation_v4 import CleanRecommendationV4
+from nsfw_recommendation_v4 import NsfwRecommendationV4
+from combined_recommendation_v4 import CombinedRecommendationV4
+
 _LOGGER = logging.getLogger(__name__)
 
 _ONE_DAY = datetime.timedelta(days=1)
@@ -108,6 +112,11 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
         self.clean_recommender_v3 = CleanRecommendationV3()
         self.nsfw_recommender_v3 = NsfwRecommendationV3()
         self.combined_recommender_v3 = CombinedRecommendationV3()
+
+        # Initialize v4 recommenders
+        self.clean_recommender_v4 = CleanRecommendationV4()
+        self.nsfw_recommender_v4 = NsfwRecommendationV4()
+        self.combined_recommender_v4 = CombinedRecommendationV4()
         return
 
     def get_ml_feed(self, request, context):
@@ -551,6 +560,78 @@ class MLFeedServicer(video_recommendation_pb2_grpc.MLFeedServicer):
             watch_history_uris=watch_history_uris,
             num_results=num_results,
         )
+    def get_ml_feed_clean_v4(self, request, context):
+        watch_history_uris = [item.video_id for item in request.watch_history] + [
+            item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
+        successful_plays = [
+            {
+                "video_uri": item.video_id,
+                "item_type": item.item_type,
+                "percent_watched": item.percent_watched,
+            }
+            for item in request.success_history
+        ]
+        num_results = request.num_results
+
+        return self.clean_recommender_v4.get_collated_recommendation(
+            successful_plays=successful_plays,
+            watch_history_uris=watch_history_uris,
+            num_results=num_results,
+        )
+    
+    def get_ml_feed_nsfw_v4(self, request, context):
+        watch_history_uris = [item.video_id for item in request.watch_history] + [
+            item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
+        successful_plays = [
+            {
+                "video_uri": item.video_id, 
+                "item_type": item.item_type,
+                "percent_watched": item.percent_watched,
+            }
+            for item in request.success_history
+        ]
+        num_results = request.num_results
+
+        return self.nsfw_recommender_v4.get_collated_recommendation(
+            successful_plays=successful_plays,
+            watch_history_uris=watch_history_uris,
+            num_results=num_results,
+        )
+    
+    def get_ml_feed_combined_v4(self, request, context):
+        watch_history_uris = [item.video_id for item in request.watch_history] + [
+            item.video_id for item in request.filter_posts
+        ]
+        watch_history_uris = [
+            uri if uri.startswith("gs://") else f"gs://yral-videos/{uri}.mp4"
+            for uri in watch_history_uris
+        ]
+        successful_plays = [
+            {
+                "video_uri": item.video_id,
+                "item_type": item.item_type,
+                "percent_watched": item.percent_watched,
+            }
+            for item in request.success_history
+        ]
+        num_results = request.num_results
+
+        return self.combined_recommender_v4.get_collated_recommendation(
+            successful_plays=successful_plays,
+            watch_history_uris=watch_history_uris,
+            num_results=num_results,
+        )
+
 
 
 def _wait_forever(server):

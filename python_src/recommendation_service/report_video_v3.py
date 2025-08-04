@@ -136,14 +136,6 @@ class ReportVideoV3:
                 ):
                     continue
 
-                # Ensure post_id is an integer
-                try:
-                    similar_post_id = int(similar_video["post_id"])
-                except (ValueError, TypeError):
-                    _LOGGER.warning(
-                        f"Skipping invalid post_id in similar video: {similar_video['post_id']}"
-                    )
-                    continue
 
                 similar_video_report = {
                     "reportee_user_id": str(reportee_user_id),
