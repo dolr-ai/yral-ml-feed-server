@@ -33,6 +33,7 @@ jobs:
           flyctl secrets set --stage --app "yral-ml-feed-server" GS_VIDEO_BUCKET="yral-videos"
           flyctl secrets set --stage --app "yral-ml-feed-server" "GRPC_OFF_CHAIN_JWT_TOKEN=$GRPC_OFF_CHAIN_JWT_TOKEN"
           flyctl secrets set --stage --app "yral-ml-feed-server" "ML_FEED_CACHE_REDIS_URL=$ML_FEED_CACHE_REDIS_URL"
+          flyctl secrets set --stage --app "yral-ml-feed-server" "ML_FEED_CACHE_MEMORYSTORE_URL=$ML_FEED_CACHE_MEMORYSTORE_URL"
         env:
           FLY_API_TOKEN: ${{ secrets.YRAL_GPU_COMPUTE_TASKS_GITHUB_ACTION_FLY_IO_DEPLOYMENT_TOKEN }}
           UPSTASH_URL: ${{ secrets.UPSTASH_URL }}
@@ -40,6 +41,7 @@ jobs:
           SERVICE_CRED: ${{ secrets.SERVICE_CRED }}
           GRPC_OFF_CHAIN_JWT_TOKEN: ${{ secrets.ENCODED_JWT_TOKEN_FOR_CALLING_ML_FEED_SERVER_FROM_OFFCHAIN_AGENT_SERVER }}
           ML_FEED_CACHE_REDIS_URL: ${{ secrets.YRAL_ML_FEED_CACHE_REDIS_URL }}
+          ML_FEED_CACHE_MEMORYSTORE_URL: ${{ secrets.ML_FEED_CACHE_MEMORYSTORE_URL }}
       - name: Deploy a docker container to fly.io
         run: flyctl deploy --remote-only --yes -c fly-prod.toml --dockerfile Dockerfile.prod
         env:
