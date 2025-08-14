@@ -11,7 +11,10 @@ use yral_ml_feed_cache::{
 };
 use yral_types::post::PostItemV2;
 
-use crate::{feed::utils::get_shuffled_limit_list_v3, utils::remove_duplicates_v2};
+use crate::{
+    feed::utils::get_shuffled_limit_list_v3,
+    utils::{convert_post_items_v3_to_v2, remove_duplicates_v2},
+};
 
 pub async fn get_coldstart_clean_cache_noinput_impl(
     ml_feed_cache: MLFeedCacheState,
@@ -22,12 +25,15 @@ pub async fn get_coldstart_clean_cache_noinput_impl(
         .map_err(|e| anyhow::anyhow!("Failed to get num posts in cache: {}", e))?;
 
     let post_index = rand::rng().random_range(0..num_posts_in_cache);
-    let feed = ml_feed_cache
-        .get_cache_items_v2(GLOBAL_CACHE_CLEAN_KEY_V2, post_index, post_index + 1)
+    let feed_v3 = ml_feed_cache
+        .get_cache_items_v3_resilient(GLOBAL_CACHE_CLEAN_KEY_V2, post_index, post_index + 1)
         .await
         .map_err(|e| anyhow::anyhow!("Failed to get post from cache: {}", e))?;
 
-    Ok(remove_duplicates_v2(feed))
+    // Convert PostItemV3 to PostItemV2, filtering out non-u64 post_ids
+    let feed_v2 = convert_post_items_v3_to_v2(feed_v3);
+
+    Ok(remove_duplicates_v2(feed_v2))
 }
 
 pub async fn get_coldstart_clean_cache_noinput_user_impl(
@@ -52,10 +58,13 @@ pub async fn get_coldstart_clean_cache_input_impl(
     ml_feed_cache: MLFeedCacheState,
     num_results: u32,
 ) -> Result<Vec<PostItemV2>, anyhow::Error> {
-    let global_cache_clean_feed = ml_feed_cache
-        .get_cache_items_v2(GLOBAL_CACHE_CLEAN_KEY_V2, 0, MAX_GLOBAL_CACHE_LEN)
+    let global_cache_clean_feed_v3 = ml_feed_cache
+        .get_cache_items_v3_resilient(GLOBAL_CACHE_CLEAN_KEY_V2, 0, MAX_GLOBAL_CACHE_LEN)
         .await
         .map_err(|e| anyhow::anyhow!("Failed to get global cache clean feed: {}", e))?;
+
+    // Convert PostItemV3 to PostItemV2, filtering out non-u64 post_ids
+    let global_cache_clean_feed = convert_post_items_v3_to_v2(global_cache_clean_feed_v3);
 
     Ok(get_shuffled_limit_list_v3(
         remove_duplicates_v2(global_cache_clean_feed),
@@ -80,7 +89,7 @@ pub async fn get_coldstart_clean_cache_input_user_impl(
     }
 
     let watch_history = ml_feed_cache
-        .get_history_items_v2(
+        .get_watch_history_items_v3_resilient(
             &format!("{}{}", user_id, USER_WATCH_HISTORY_CLEAN_SUFFIX_V2),
             0,
             MAX_WATCH_HISTORY_CACHE_LEN,
@@ -98,14 +107,17 @@ pub async fn get_coldstart_clean_cache_input_user_impl(
         watch_history_set.insert(item.video_id);
     }
 
-    let user_cache_items = ml_feed_cache
-        .get_cache_items_v2(
+    let user_cache_items_v3 = ml_feed_cache
+        .get_cache_items_v3_resilient(
             &format!("{}{}", user_id, USER_CACHE_CLEAN_SUFFIX_V2),
             0,
             num_posts_in_cache,
         )
         .await
         .map_err(|e| anyhow::anyhow!("Failed to get user cache items: {}", e))?;
+
+    // Convert PostItemV3 to PostItemV2, filtering out non-u64 post_ids
+    let user_cache_items = convert_post_items_v3_to_v2(user_cache_items_v3);
 
     let mut feed = Vec::new();
     for item in user_cache_items {

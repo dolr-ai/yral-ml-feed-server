@@ -16,7 +16,7 @@ use yral_types::post::PostItemV2;
 use crate::{
     consts::ML_FEED_PY_SERVER,
     grpc_services::ml_feed_py::{self, ml_feed_client::MlFeedClient},
-    utils::{remove_duplicates_v2, to_rfc3339},
+    utils::{convert_history_items_v3_to_v2, remove_duplicates_v2, to_rfc3339},
 };
 
 #[instrument(skip(ml_feed_cache, metadata_client, filter_results))]
@@ -29,9 +29,12 @@ pub async fn get_ml_feed_clean_v3_impl(
 ) -> Result<Vec<PostItemV2>, anyhow::Error> {
     let key = format!("{}{}", user_id, USER_WATCH_HISTORY_CLEAN_SUFFIX_V2);
 
-    let watch_history = ml_feed_cache
-        .get_history_items_v2(&key, 0, MAX_WATCH_HISTORY_CACHE_LEN)
+    let watch_history_v3 = ml_feed_cache
+        .get_watch_history_items_v3_resilient(&key, 0, MAX_WATCH_HISTORY_CACHE_LEN)
         .await?;
+
+    // Convert MLFeedCacheHistoryItemV3 to V2, filtering out non-u64 post_ids
+    let watch_history = convert_history_items_v3_to_v2(watch_history_v3);
 
     let watch_history_items = watch_history
         .iter()
@@ -46,9 +49,12 @@ pub async fn get_ml_feed_clean_v3_impl(
 
     let key = format!("{}{}", user_id, USER_SUCCESS_HISTORY_CLEAN_SUFFIX_V2);
 
-    let success_history = ml_feed_cache
-        .get_history_items_v2(&key, 0, MAX_WATCH_HISTORY_CACHE_LEN)
+    let success_history_v3 = ml_feed_cache
+        .get_watch_history_items_v3_resilient(&key, 0, MAX_WATCH_HISTORY_CACHE_LEN)
         .await?;
+
+    // Convert MLFeedCacheHistoryItemV3 to V2, filtering out non-u64 post_ids
+    let success_history = convert_history_items_v3_to_v2(success_history_v3);
 
     let success_history_items = success_history
         .iter()
@@ -135,7 +141,10 @@ pub async fn get_ml_feed_clean_v3_impl(
         );
 
         if original_response_len - response_items.len() > 20 {
-            tracing::error!("HIGH_FILTER_RATE_ALERT: Request details: {:?}", request_data);
+            tracing::error!(
+                "HIGH_FILTER_RATE_ALERT: Request details: {:?}",
+                request_data
+            );
         }
     }
 
@@ -157,9 +166,12 @@ pub async fn get_ml_feed_nsfw_v3_impl(
 ) -> Result<Vec<PostItemV2>, anyhow::Error> {
     let key = format!("{}{}", user_id, USER_WATCH_HISTORY_NSFW_SUFFIX_V2);
 
-    let watch_history = ml_feed_cache
-        .get_history_items_v2(&key, 0, MAX_WATCH_HISTORY_CACHE_LEN)
+    let watch_history_v3 = ml_feed_cache
+        .get_watch_history_items_v3_resilient(&key, 0, MAX_WATCH_HISTORY_CACHE_LEN)
         .await?;
+
+    // Convert MLFeedCacheHistoryItemV3 to V2, filtering out non-u64 post_ids
+    let watch_history = convert_history_items_v3_to_v2(watch_history_v3);
 
     let watch_history_items = watch_history
         .iter()
@@ -174,9 +186,12 @@ pub async fn get_ml_feed_nsfw_v3_impl(
 
     let key = format!("{}{}", user_id, USER_SUCCESS_HISTORY_NSFW_SUFFIX_V2);
 
-    let success_history = ml_feed_cache
-        .get_history_items_v2(&key, 0, MAX_WATCH_HISTORY_CACHE_LEN)
+    let success_history_v3 = ml_feed_cache
+        .get_watch_history_items_v3_resilient(&key, 0, MAX_WATCH_HISTORY_CACHE_LEN)
         .await?;
+
+    // Convert MLFeedCacheHistoryItemV3 to V2, filtering out non-u64 post_ids
+    let success_history = convert_history_items_v3_to_v2(success_history_v3);
 
     let success_history_items = success_history
         .iter()
@@ -263,7 +278,10 @@ pub async fn get_ml_feed_nsfw_v3_impl(
         );
 
         if original_response_len - response_items.len() > 20 {
-            tracing::error!("HIGH_FILTER_RATE_ALERT: Request details: {:?}", request_data);
+            tracing::error!(
+                "HIGH_FILTER_RATE_ALERT: Request details: {:?}",
+                request_data
+            );
         }
     }
 

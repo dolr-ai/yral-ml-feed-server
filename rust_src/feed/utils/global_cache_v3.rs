@@ -1,4 +1,3 @@
-use candid::Principal;
 use yral_metadata_client::MetadataClient;
 use yral_types::post::PostItemV2;
 
