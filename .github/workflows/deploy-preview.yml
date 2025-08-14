@@ -63,6 +63,7 @@ jobs:
           flyctl secrets set --stage --app "$APP_NAME" GS_VIDEO_BUCKET="yral-videos"
           flyctl secrets set --stage --app "$APP_NAME" "GRPC_OFF_CHAIN_JWT_TOKEN=$GRPC_OFF_CHAIN_JWT_TOKEN"
           flyctl secrets set --stage --app "$APP_NAME" "ML_FEED_CACHE_REDIS_URL=$ML_FEED_CACHE_REDIS_URL"
+          flyctl secrets set --stage --app "$APP_NAME" "ML_FEED_CACHE_MEMORYSTORE_URL=$ML_FEED_CACHE_MEMORYSTORE_URL"
           flyctl deploy --app $APP_NAME
         env:
           UPSTASH_URL: ${{ secrets.UPSTASH_URL }}
@@ -70,3 +71,4 @@ jobs:
           SERVICE_CRED: ${{ secrets.SERVICE_CRED }}
           GRPC_OFF_CHAIN_JWT_TOKEN: ${{ secrets.ENCODED_JWT_TOKEN_FOR_CALLING_ML_FEED_SERVER_FROM_OFFCHAIN_AGENT_SERVER }}
           ML_FEED_CACHE_REDIS_URL: ${{ secrets.YRAL_ML_FEED_CACHE_REDIS_URL }}
+          ML_FEED_CACHE_MEMORYSTORE_URL: ${{ secrets.ML_FEED_CACHE_MEMORYSTORE_URL }}
