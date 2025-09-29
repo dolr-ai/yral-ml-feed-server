@@ -102,7 +102,8 @@ class ReportVideoV3:
 
         try:
             # Find similar videos
-            similar_videos = self.find_similar_videos(video_id)
+            # similar_videos = self.find_similar_videos(video_id)
+            similar_videos = []
             if similar_videos:
                 _LOGGER.info(
                     f"Found {len(similar_videos)} similar videos to reported video"
