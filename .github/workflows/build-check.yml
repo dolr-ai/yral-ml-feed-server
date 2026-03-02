@@ -24,6 +24,7 @@ jobs:
 
       - name: Install prereqs
         run: |
+          sudo apt-get update
           sudo apt-get install protobuf-compiler musl-tools
 
       - name: Rust Setup
